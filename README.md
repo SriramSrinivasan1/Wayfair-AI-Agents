@@ -1,10 +1,9 @@
 # 🛋️ Wayfair Rugs Market Intelligence — AI Agent System
 
-![Extern](https://img.shields.io/badge/Extern-Oct%202025%20Cohort-7C3AED?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
-![AI Agents](https://img.shields.io/badge/AI%20Agents-5%20Connected-10B981?style=flat-square)
-![Google Sheets](https://img.shields.io/badge/Google%20Sheets-API-34A853?style=flat-square&logo=googlesheets&logoColor=white)
 ![n8n](https://img.shields.io/badge/Workflow-n8n-EA4B71?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
+![Google Sheets](https://img.shields.io/badge/Google%20Sheets-API-34A853?style=flat-square&logo=googlesheets&logoColor=white)
+![AI Agents](https://img.shields.io/badge/AI%20Agents-5%20Connected-10B981?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Complete-22C55E?style=flat-square)
 
 > **5 connected AI agents. Live competitor monitoring. Decision-ready insights — automatically.**
