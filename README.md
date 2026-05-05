@@ -274,5 +274,3 @@ GOOGLE_SHEETS_CREDENTIALS=path/to/credentials.json
 - **AI-generated content:** Blog drafts and social captions produced by Agent 4 are starting points and require human review before publication.
 
 ---
-
-[![GitHub](https://img.shields.io/badge/GitHub-sriramprog-181717?style=flat-square&logo=github)](https://github.com/sriramprog)
