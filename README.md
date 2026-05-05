@@ -7,6 +7,8 @@
 
 > **5 connected AI agents. Live competitor monitoring. Decision-ready insights — automatically.**
 
+📽️ **[Watch the AI Agent Demo Presentation](https://drive.google.com/file/d/1pzRaQG9wtIkUkZP-wvOcaWC1L0_lt1Ip/view?usp=sharing)**
+
 Built for Wayfair's Rugs category team to eliminate the manual effort behind trend discovery, competitor tracking, and content ideation. Instead of periodic ad hoc research, the system runs continuously and surfaces structured, actionable intelligence to a single live dashboard.
 
 ---
