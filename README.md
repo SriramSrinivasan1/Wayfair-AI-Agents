@@ -1,7 +1,6 @@
 # 🛋️ Wayfair Rugs Market Intelligence — AI Agent System
 
 ![n8n](https://img.shields.io/badge/Workflow-n8n-EA4B71?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Google Sheets](https://img.shields.io/badge/Google%20Sheets-API-34A853?style=flat-square&logo=googlesheets&logoColor=white)
 ![AI Agents](https://img.shields.io/badge/AI%20Agents-5%20Connected-10B981?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Complete-22C55E?style=flat-square)
@@ -205,9 +204,6 @@ wayfair-rugs-market-intelligence/
 │   └── agent5_dashboard/
 │       ├── workflow.json
 │       └── dashboard_screenshot.png
-│
-├── notebooks/
-│   └── market_intelligence_analysis.ipynb
 │
 ├── presentation/
 │   └── Sriram_Wayfair_AI_Agent_Final_Presentation.pdf
