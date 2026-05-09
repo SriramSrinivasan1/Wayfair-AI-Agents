@@ -77,17 +77,25 @@ All agents write structured JSON outputs to a centralized data store. The dashbo
 
 ### Agent 1 — Moodboard Generator
 **Design Prompt → AI-Curated Visual Mood**
-
-Transforms short text prompts (e.g., `"bohemian rugs, neutral tones"`) into AI-generated moodboards using the Google Gemini image generation API. Enables rapid visual trend exploration without manual curation.
-
+ 
+Transforms short text prompts into AI-generated moodboard briefs using Google Gemini, structured for immediate use by the design team. Each brief includes key rug designs, material close-ups, styled interior spaces, and complementary decor elements.
+ 
 | Parameter | Detail |
 |-----------|--------|
-| Input | Text prompt (style + material keywords, <10 words) |
-| Output | AI-generated moodboard image grid |
-| Model | Google Gemini Image Generation API |
-| Limit | 20 generations/day (free tier) |
-
+| Input | Short style + material prompt (e.g. "Modern colored rug.") |
+| Output | Structured moodboard brief with 4 design sections |
+| Model | Google Gemini Chat Model via n8n |
+| Workflow | n8n — chat trigger → AI Agent → Gemini |
+ 
 **Prompt Tips:** Keep prompts short and specific — `"eco-friendly jute rugs"`, `"modern geometric rug"`. Avoid subjective adjectives like "beautiful" or "nice."
+ 
+**Sample Moodboard Output** *(prompt: "Bohemian rugs, neutral tones")*
+ 
+[Moodboard Sample](https://drive.google.com/file/d/11x_ItM9PIpcpFgQ-5uknYipmGPZbqTXk/view?usp=sharing)
+ 
+**n8n Workflow:**
+ 
+[Agent 1 Workflow](https://drive.google.com/file/d/1XyCB-lMYrqDrP-N_B2SgaYMFkkt9TmVA/view?usp=sharing)
 
 ---
 
