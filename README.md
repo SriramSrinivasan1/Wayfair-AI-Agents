@@ -102,81 +102,103 @@ Transforms short text prompts into AI-generated moodboard briefs using Google Ge
 ### Agent 2 — Rugs Trend Discovery
 **Multi-Source Signals → Emerging Trend Reports**
 
-Monitors Amazon marketplace listings, Google Search results, and RSS feeds to identify and categorize rug design trends. Distinguishes emerging trends from sustained ones.
+Identifies emerging vs. sustained rug trends by ingesting live data from Amazon, Google Search, and RSS industry feeds — then using Gemini to generate a structured HTML trend report, updated weekly.
 
 | Parameter | Detail |
 |-----------|--------|
-| Input | Amazon/marketplace pages · Google Search · RSS Feeds |
-| Output | Trend name, category, material, pattern, style, feature, price bucket, supporting examples |
-| Update Frequency | Weekly |
+| Input | Chat message (keyword, topic, or Amazon URL) |
+| Sources | Amazon PDPs & collections · Google Custom Search API · 4 RSS feeds |
+| RSS Feeds | Cover Magazine · Floor Trends Magazine · Google Rug Trends · Nazmiyal Antique Rugs |
+| Output | Structured HTML trend report (trend name, material, pattern, style, price bucket, source citations) |
+| Frequency | Last 7 days of signals only (auto-filtered) |
+| Workflow | n8n — chat trigger → intent classification → parallel data collection → merge → Gemini analysis → HTML output |
 
-**Sample Trends Detected (Jan 2026):**
-- Strong demand for **washable & durable indoor/outdoor rugs**
-- Rising preference for **easy-care vintage-style rugs**
-- High-end interest in **authentic antique and vintage pieces**
+**How it works:** The agent first classifies user intent via Gemini — if trend-related, it fans out in parallel to scrape Amazon product pages, run a Google Search, and pull from 4 RSS feeds simultaneously. All results are merged, normalized, and passed to Gemini, which produces a formatted HTML trend report with source citations. The report is also pushed to the Agent 5 dashboard.
+
+**Workflow Overview:**
+
+[Agent 2 Workflow](https://drive.google.com/file/d/14ELgjE-FWKzJcKOJNrdVzIoCbQDL_C1h/view?usp=sharing)
+[Market Trend Report](https://drive.google.com/file/d/12y086saZz0xfRjsuba22VMPZIhOr4AsZ/view?usp=sharing)
 
 ---
 
 ### Agent 3 — Competitor Monitoring
-**Competitor PDPs → Actionable Gap Analysis**
-
-Scrapes competitor product detail pages and bestseller listings to extract structured pricing, rating, feature, and launch signal data. Benchmarks against Wayfair's assortment to surface gaps and whitespace.
-
+**Competitor Pages → Actionable Marketing Intelligence**
+ 
+Scrapes Wayfair's own rug assortment as a baseline, then pulls competitor data from Amazon and Ruggable in parallel. A swappable Gemini system message reinterprets the same dataset through different business lenses — pricing, messaging, features, or whitespace — producing a structured HTML competitive intelligence report.
+ 
 | Parameter | Detail |
 |-----------|--------|
-| Input | Competitor PDPs and bestseller pages |
-| Output | Competitor name · Product/collection · Price & rating · PDP highlights · Launch signals · Wayfair gap + suggested action |
-| Competitors Monitored | Amazon, Target, and other major home goods retailers |
+| Input | Chat message (keyword, topic, or Amazon URL) |
+| Competitors Monitored | Amazon (PDPs + bestsellers fallback) · Ruggable (category → product pages) |
+| Baseline | Wayfair rug category page (title · SKU · price · rating · reviews) |
+| Output | HTML report (competitor · price · rating · PDP highlights · Wayfair gap · suggested action) |
+| Scraping Tool | Firecrawl API (rate-safe, browser-rendered HTML) |
+| Workflow | n8n — chat trigger → parallel scraping → merge + deduplicate → Gemini analysis → HTML output |
+ 
+**How it works:** Wayfair's own category page is scraped first to establish an internal baseline. Amazon and Ruggable are scraped in parallel — Amazon supports both direct product URLs and a bestsellers fallback when no links are provided. All data is merged, deduplicated by ASIN, and passed to Gemini. The active system message controls what the agent focuses on — swapping it simulates how different Wayfair teams (merchandising, marketing, or leadership) would analyze the same dataset.
+ 
+**Swappable analysis lenses:**
+- **Pricing** — where does Wayfair overlap or get undercut?
+- **Messaging** — tone of voice, emotional framing, keyword gaps
+- **Features** — washability, materials, certifications competitors highlight
+- **Whitespace** — assortment gaps Wayfair could fill
+**Workflow Overview:**
+ 
+[Agent 3 Workflow](https://drive.google.com/file/d/12WlHUz7AN04w79WUnjTzHSREnr3eNtzY/view?usp=sharing)
+[Competitive Analysis Report](https://drive.google.com/file/d/10Ex2Sgm64NE5RZNXlE1R3udArCpB7vZ3/view?usp=sharing)
 
-**Sample Output Fields:**
-```json
-{
-  "competitor": "Amazon",
-  "product": "Modern Indoor-Outdoor Rug Collection",
-  "price_range": "$45–$189",
-  "rating": 4.4,
-  "pdp_highlight": "Washable, pet-friendly, UV-resistant",
-  "launch_signal": "New colorways added Q4 2025",
-  "wayfair_gap": "Limited brand narrative on washability benefits",
-  "suggested_action": "Create content series: washable rug lifestyle benefits"
-}
-```
 
 ---
 
 ### Agent 4 — AI Insights & Content Generation
 **Trend + Competitor Signals → Decision-Ready Content**
 
-Takes the structured outputs from Agents 2 and 3 and generates insight summaries, recommended actions, and ready-to-use content ideas (blog outlines, social captions, campaign concepts) — ranked by impact level.
+Scrapes Amazon and Walmart product data in parallel, passes it through two chained Gemini agents — the first generates structured market signals, the second translates those signals into Wayfair-ready content. Outputs are saved to Supabase for persistence and pushed to the Agent 5 dashboard.
 
 | Parameter | Detail |
 |-----------|--------|
-| Input | Trend discovery output + competitor monitoring output |
-| Output | Summary insight · Recommended action · Content idea (blog/social/campaign) · Impact level |
+| Input | Chat message with Amazon and/or Walmart product or collection URLs |
+| Sources | Amazon (PDPs · collections · bestsellers) · Walmart (best-selling rugs category) |
+| Agent 1 Output | Structured JSON signals — trend signal · competitor signal · style signal |
+| Agent 2 Output | Blog strategy · key insights · Instagram caption ideas |
+| Storage | Supabase (create or update row — persists insights across runs) |
+| Workflow | n8n — chat trigger → parallel scraping → merge → signal agent → content agent → HTML + Supabase |
 
-**Sample Content Output — Blog Strategy:**
-> *"Spill-Proof Style: Why Wayfair's Washable Rugs Are Your New Best Friend"*  
-> Target: Home decor enthusiasts, budget-conscious millennials  
-> SEO Focus: washable rugs, easy clean rugs, pet-friendly rugs, neutral rugs
+**How it works:** URLs are extracted and classified from the chat input. Amazon and Walmart are scraped in parallel — Amazon supports both direct product pages and collection/bestseller pages, Walmart targets best-selling rug listings. All data is cleaned, deduplicated, and merged into a single dataset. The first Gemini agent analyzes the combined data and produces three structured JSON signals (trend, competitor, style). The second Gemini agent — acting as a Wayfair marketing strategist — translates those signals into brand-aligned content ideas. The final HTML report is downloadable and the insights are written to Supabase for the Agent 5 dashboard.
+
+**Two-agent chain:**
+- **Signal agent** — analyzes raw product data, enforces consistent JSON output structure
+- **Content agent** — thinks like a Wayfair marketing strategist, produces blog strategy, key insights, and social captions
+
+**Workflow Overview:**
+
+[Agent 4 Workflow](https://drive.google.com/file/d/1LdfgTdVpZdlTZ3iNp58Qscs-QErSgqck/view?usp=sharing)
+[Marketing Content Ideas](https://drive.google.com/file/d/1w0fhf533UbU501-SrlqfAoCeA2B3rHOf/view?usp=sharing)
 
 ---
 
 ### Agent 5 — Market Intelligence Dashboard
-**All Agents → Single Live View for the Rugs Team**
+**All Agents → Single Live View for Wayfair's Rugs Team**
 
-Consolidates all agent outputs into a single auto-refreshing Google Sheets dashboard with an Executive Summary tab and conditional formatting highlighting priority insights.
+The integration layer that ties the entire system together. On a single trigger, it fetches the stored HTML reports from Agents 2, 3, and 4 out of Supabase, passes each through a dedicated Gemini model to extract structured insights, and appends the cleaned data into three tabs of a live Google Sheets dashboard.
 
 | Parameter | Detail |
 |-----------|--------|
-| Data Source | Structured JSON outputs from Agents 1–4 |
-| Update Mechanism | n8n workflow automation |
-| Design Principle | Quick scanning, not deep analysis |
+| Trigger | Manual ("Execute workflow") or scheduled |
+| Data Sources | Supabase — stored outputs from Agents 2, 3, and 4 |
+| Processing | 3 parallel Gemini models — one per report type |
+| Output | Google Sheets dashboard — 3 tabs, continuously appended |
+| Dashboard Tabs | Trend Signals · Competitor Moves · All Insights |
+| Workflow | n8n — manual trigger → Supabase fetch → Gemini read → structure JSON → write to Sheets |
 
-**Dashboard Structure:**
-- **Executive Summary tab** — top emerging trend, Wayfair gap, suggested action
-- **Market Signals layer** — raw data with source URLs
-- **Content Ideas tab** — blog/social/campaign drafts ready for review
-- **Competitor Tracker tab** — pricing and PDP comparison table
+**How it works:** On trigger, three Supabase nodes fetch the latest HTML reports generated by Agents 2, 3, and 4 in parallel. Each report is passed to a dedicated Gemini model that reads and interprets the HTML, identifying key patterns and signals relevant to Wayfair's strategy. A code node then cleans and flattens the output into a consistent JSON structure compatible with Google Sheets. Finally, three update nodes append the data into their respective dashboard tabs — Trend Signals, Competitor Moves, and All Insights — building a continuously growing record over time.
+
+**Dashboard design principle:** Built for quick scanning, not deep analysis. Conditional formatting highlights priority insights so the Rugs team can act without reading every row.
+
+**Workflow Overview:**
+
+[Agent 5 Workflow](https://drive.google.com/file/d/155ymURibUfSXd-Sq9mGRLaIdGPnHJcQU/view?usp=sharing)
 
 ---
 
